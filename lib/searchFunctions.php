@@ -14,7 +14,12 @@ function searchText($searchText) {
  * @return callable La funzione che verrà utilizzata da array_filter
  */
 function searchStatus(string $status) : callable {
-    
+    return function($mockTaskItem) use ($status)
+    {
+        $result = strpos($mockTaskItem['item'],$status) !==false;
+        return $result;
+    };
 } 
 
 
+//scrivere in function la cosa giusta, che fa funzionare tutto
