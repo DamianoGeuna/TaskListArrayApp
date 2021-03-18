@@ -1,6 +1,6 @@
 <?php
 require "./vendor/testTools/testTool.php";
-require "./case_study/tasklistArray/lib/searchFunctions.php";
+require "./lib/searchFunctions.php";
 
 $testCases = [
     [
@@ -58,10 +58,12 @@ $mockTaskList = array(
 );
 
 
-foreach ($testCases as $testCase) {
+foreach ($testCases as $testCase)
+{  
     extract($testCase);
     $actual = array_filter($mockTaskList, searchText($searchText));
     
-    assertEquals('array', gettype($actual),'il risultato è un ');
-    assertEquals($expectedCount, count($actual), $description);
+    assertEquals('array', gettype($actual),'il risultato è');
+    
+    assertEquals($expectedCount, count($actual), $description);    
 }
