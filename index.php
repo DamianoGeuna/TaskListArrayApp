@@ -1,15 +1,26 @@
 <?php
 
+//Prendi i file php che servono
 require "./lib/JSONReader.php";
 require "./lib/searchFunctions.php";
 
+$taskList = JSONReader('./dataset/TaskList.json');
 
 
+if (isset($_GET['searchText'])) {
+    $searchText = trim(filter_var($_GET['searchText'], FILTER_SANITIZE_STRING));
+    $taskList = array_filter($taskList, searchText($searchText));
+}
 
+if ((isset($_GET['status']))) {
+    $status = $_GET['status'];
+    $taskList = array_filter($taskList, searchStatus($status));
+}
 
+if(isset($_GET['status'])==''){
+    $_GET['status']='all';
+}
 
-
-$elenco =JSONReader('./dataset/')
 
 
 
@@ -37,6 +48,31 @@ $elenco =JSONReader('./dataset/')
     </div>
  
     <div class="container">
+
+        <form action="./index.php">
+            <input type="text" value="<?=  $searchText ?>" name="searchText" >
+            <button type="submit">cerca</button>
+
+            <div id="status">
+
+                <input type="radio" name="status" value="progress" id="progress">
+                <label for="progress">progress</label>
+
+                <input type="radio" name="status" value="done" id="done">
+                <label for="done">done</label>
+
+                <input type="radio" name="status" value="todo" id="todo">
+                <label for="todo">todo</label>
+
+                <input type="radio" name="status" value="all" id="all">
+                <label for="all">all</label>
+
+
+            </div>
+
+            </form>
+
+
         <div class="input-group pb-3 my-1">
             <label class="w-100 pb-1 fw-bold" for="searchText">Cerca</label>
             <input id="searchText"  type="text" class="form-control" placeholder="attività da cercare">
@@ -73,6 +109,7 @@ $elenco =JSONReader('./dataset/')
                     <th class="text-center">stato</th>
                     <th class="text-center">data</th>
                 </tr>
+                <!--
                 <tr>
                     <td>Comprare il latte</td>
                     <td class="text-center">
@@ -99,7 +136,7 @@ $elenco =JSONReader('./dataset/')
                     <td class="text-nowrap">
                         18 Settembre
                     </td>
-                </tr>
+                </tr>-->
             </table>
 
         </section>
