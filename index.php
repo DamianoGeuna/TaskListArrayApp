@@ -7,28 +7,41 @@ require "./lib/searchFunctions.php";
 $taskList = JSONReader('./dataset/TaskList.json');
 
 
-if (isset($_GET['searchText'])) {
-    $searchText = trim(filter_var($_GET['searchText'], FILTER_SANITIZE_STRING));
+if(isset($_GET['searchText']) && trim($_GET['searchText'])!=='')
+{
+    $searchText=trim(filter_var($_GET['searchText'], FILTER_SANITIZE_STRING));
     $taskList = array_filter($taskList, searchText($searchText));
+    
+    if(isset($_GET['status']) && ($_GET['status'])!=='all'){
+        $status=($_GET['status']);
+           
+        $taskList= array_filter($taskList, searchStatus($status));
+        
+    }
+    else
+    {
+        $status='all';
+    }
 }
+else
+{
+    $searchText='';
 
-if ((isset($_GET['status']))) {
-    $status = $_GET['status'];
-    $taskList = array_filter($taskList, searchStatus($status));
+    if(isset($_GET['status']) && ($_GET['status'])!=='all'){
+        $status=($_GET['status']);      
+        $taskList= array_filter($taskList, searchStatus($status));
+        
+    }
+    else
+    {
+        
+        $status='all';
+    }
 }
-
-if(isset($_GET['status'])==''){
-    $_GET['status']='all';
-}
-
 
 
 
 ?>
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -46,60 +59,45 @@ if(isset($_GET['status'])==''){
             <h1 class="display-1">Tasklist</h1>
         </div>
     </div>
+    <form action="index.php">
  
-    <div class="container">
-
-        <form action="./index.php">
-            <input type="text" value="<?=  $searchText ?>" name="searchText" >
-            <button type="submit">cerca</button>
-
-            <div id="status">
-
-                <input type="radio" name="status" value="progress" id="progress">
-                <label for="progress">progress</label>
-
-                <input type="radio" name="status" value="done" id="done">
-                <label for="done">done</label>
-
-                <input type="radio" name="status" value="todo" id="todo">
-                <label for="todo">todo</label>
-
-                <input type="radio" name="status" value="all" id="all">
-                <label for="all">all</label>
-
-
+        <div class="container">           
+            
+            <div class="input-group pb-3 my-1">
+                <label class="w-100 pb-1 fw-bold" for="searchText">Cerca</label>
+                <input id="searchText" name="searchText" type="text" class="form-control" placeholder="attività da cercare"><!--Ricordati del name, pirla-->
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Invia</button>
+                </div>
             </div>
+        
 
-            </form>
 
 
-        <div class="input-group pb-3 my-1">
-            <label class="w-100 pb-1 fw-bold" for="searchText">Cerca</label>
-            <input id="searchText"  type="text" class="form-control" placeholder="attività da cercare">
-            <div class="input-group-append">
-              <button class="btn btn-primary" type="button">Invia</button>
-            </div>
-        </div>
+
 
         <div id="status-radio" class=" mb-3">
             <div class="fw-bold pe-2 w-100">Stato attività</div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" value="option1">
+                <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name='status' value="all" id="all" <?php if ($status == "all") echo "checked";?>>
                 <label class="form-check-label" >tutti</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio"   value="option1">
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name='status'  value="todo" id="todo" <?php if ($status == "todo") echo "checked";?>>
                 <label class="form-check-label" >da fare</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio"   value="option2">
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name='status'  value="progress" id="progress" <?php if ($status == "progress") echo "checked";?>>
                 <label class="form-check-label" >in lavorazione</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio"   value="option2">
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name='status'  value="done" id="done" <?php if ($status == "done") echo "checked";?>>
                 <label class="form-check-label" >fatto</label>
-              </div>
+            </div>
         </div>
+
+    </form>
+
         <!--Qui è da cambiare, è solo per capire-->
         <section class="tasklist mt-3">
             <h1 class="fw-bold fs-6">Elenco delle attività</h1>
@@ -109,6 +107,27 @@ if(isset($_GET['status'])==''){
                     <th class="text-center">stato</th>
                     <th class="text-center">data</th>
                 </tr>
+
+
+                <?php
+                foreach ($taskList as $key => $task) { ?>
+        
+                    <?php
+                    $status = $task['status'];
+                    $taskName = $task['taskName'];
+                    $expirationDate = $task['expirationDate'];
+                    ?>
+                    <tr>
+                        <td><?=$taskName?></td>
+                        <td class="text-center">
+                            <span class="badge bg-<?= coloreStato($status)?> text-uppercase"><?=$status?></span>
+                        </td> 
+                        <td class="text-nowrap">
+                            <?=$expirationDate?>
+                        </td>
+                    </tr>
+                <?php } ?>
+
                 <!--
                 <tr>
                     <td>Comprare il latte</td>
